@@ -2,6 +2,7 @@
 import json
 import sys
 testname=sys.argv[1]
+#print '*******TEST NAME: %s *******' %(testname)
 with open('temp.json','r') as f:
 	fiodata=json.load(f)
 #print 'Total Test Nodes: %s'% (len(fiodata['client_stats'])-1)
@@ -9,9 +10,14 @@ rwsetting=fiodata['client_stats'][0]['job options']['rw']
 readpercentage=fiodata['client_stats'][0]['job options']['rwmixread']
 maxiodepth=fiodata['client_stats'][0]['job options']['iodepth']
 jobspernode=fiodata['client_stats'][0]['job options']['numjobs']
-lattarget=fiodata['client_stats'][0]['job options']['latency_target']
-latwindow=fiodata['client_stats'][0]['job options']['latency_window']
-latpercentage=fiodata['client_stats'][0]['job options']['latency_percentile']
+if 'latency_target' in fiodata['client_stats'][0]['job options']:
+	lattarget=fiodata['client_stats'][0]['job options']['latency_target']
+	latwindow=fiodata['client_stats'][0]['job options']['latency_window']
+	latpercentage=fiodata['client_stats'][0]['job options']['latency_percentile']
+else:
+	lattarget=0
+	latwindow=0
+	latpercentage=0
 for x in range(0,len(fiodata['client_stats'])):
 	if x == len(fiodata['client_stats'])-1:
 		writebw=fiodata['client_stats'][x]['write']['bw']/1024
@@ -48,4 +54,3 @@ for x in range(0,len(fiodata['client_stats'])):
 #	print 'Avg read lat:    %sms'% (fiodata['client_stats'][x]['read']['lat']['mean']/1000)
 #	print 'Max read lat:    %sms'% (fiodata['client_stats'][x]['read']['lat']['max']/1000)
 #	print 'STDev write:     %sms'% (fiodata['client_stats'][x]['read']['lat']['stddev']/1000)
-
