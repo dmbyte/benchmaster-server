@@ -18,16 +18,25 @@ else:
 	lattarget=0
 	latwindow=0
 	latpercentage=0
+
 for x in range(0,len(fiodata['client_stats'])):
+	# Since fio v2.99 time resolution changed to nanosecond, json output key name changed from 'lat' to 'lat_ns' accordingly
+	lat_key = 'lat_ns' if 'lat_ns' in fiodata['client_stats'][x]['write'] else 'lat'
+
+	if lat_key == 'lat_ns':
+		latdiv=1000000
+	else:
+		latdiv=1000
+
 	if x == len(fiodata['client_stats'])-1:
 		writebw=fiodata['client_stats'][x]['write']['bw']/1024
 		writeiops=fiodata['client_stats'][x]['write']['iops']
-		writeavglat=fiodata['client_stats'][x]['write']['lat']['mean']/1000
-		writemaxlat=fiodata['client_stats'][x]['write']['lat']['max']/1000
+		writeavglat=fiodata['client_stats'][x]['write'][lat_key]['mean']/latdiv
+		writemaxlat=fiodata['client_stats'][x]['write'][lat_key]['max']/latdiv
 		readbw=fiodata['client_stats'][x]['read']['bw']/1024
 		readiops=fiodata['client_stats'][x]['read']['iops']
-		readavglat=fiodata['client_stats'][x]['read']['lat']['mean']/1000
-		readmaxlat=fiodata['client_stats'][x]['read']['lat']['max']/1000
+		readavglat=fiodata['client_stats'][x]['read'][lat_key]['mean']/latdiv
+		readmaxlat=fiodata['client_stats'][x]['read'][lat_key]['max']/latdiv
 		print '"%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s"'% (testname,rwsetting,readpercentage,maxiodepth,jobspernode,lattarget,latwindow,latpercentage,writebw,writeiops,writeavglat,writemaxlat,readbw,readiops,readavglat,readmaxlat)
 		#print 'Write b/w:       %s MiB/s'% ((fiodata['client_stats'][x]['write']['bw'])/1024)
 		#print 'Write IOPS:      %s '% (fiodata['client_stats'][x]['write']['bw'])
